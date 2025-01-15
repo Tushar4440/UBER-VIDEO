@@ -1,6 +1,7 @@
 const userModel = require('../models/user.model');
 const userService = require('../services/user.services');
 const { validationResult } = require('express-validator');
+const blacklistTokenModel = require('../models/blacklistToken.model');
 
 //! registerUser handling for register route through validationResult got from express-validator
 //^ below registerUser function in userController.js serves as the endpoint handler for user registration.
@@ -49,6 +50,8 @@ module.exports.loginUser = async (req, res, next)=>{
     }
     //at last we generate a token and send status 200 with token and user details...
     const token = user.generateAuthToken()
+    //set token in cookie when user is loggin in...
+    res.cookie('token', token);
     res.status(200).json({token, user});
 }
 
@@ -56,3 +59,11 @@ module.exports.loginUser = async (req, res, next)=>{
 module.exports.getUserPofile = async (req, res, next)=>{
     res.status(200).json(req.user);
 }
+
+//^ below is logoutUser function for user logout handling
+module.exports.logoutUser = async (req, res, next) => {
+    res.clearCookie('token');
+    const token = req.cookies.token || req.headers.authorization.split(' ')[1];
+    await blacklistTokenModel.create({token});
+    res.status(200).json({message : 'Logged Out'});
+}   

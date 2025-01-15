@@ -126,8 +126,6 @@ Creates a new user account in the system.
 
 **4. Security measures implemented**
 
-
-
 ## Login User Endpoint
 
 ### `POST /users/login`
@@ -149,11 +147,133 @@ Authenticates a user and returns a JWT token.
 }
 ```
 
-
 ### Validation Rules
 
-* `email` is required and must be in valid email format
-* [password](vscode-file://vscode-app/c:/Users/tusha/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) is required and must be at least 6 characters long
+- `email` is required and must be in valid email format
+- 
+
+password
+
+ is required and must be at least 6 characters long
+
+### Responses
+
+#### Success Response
+
+- **Status Code:** 200 OK
+- **Content:**
+
+```json
+{
+  "token": "jwt_token_string",
+  "user": {
+    "_id": "mongodb_generated_id",
+    "fullname": {
+      "firstname": "string",
+      "lastname": "string"
+    },
+    "email": "string",
+    "socketId": null
+  }
+}
+```
+
+#### Error Responses
+
+##### Validation Error
+
+- **Status Code:** 400 Bad Request
+- **Content:**
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid email",
+      "param": "email",
+      "location": "body"
+    },
+    {
+      "msg": "Password should be atleast 6 characters in lengths",
+      "param": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+##### Authentication Error
+
+- **Status Code:** 401 Unauthorized
+- **Content:**
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+## Get User Profile Endpoint
+
+### `GET /users/profile`
+
+Retrieves the authenticated user's profile information.
+
+### Request
+
+- **Method:** GET
+- **URL:** `/users/profile`
+- **Headers:**
+  - `Authorization: Bearer <jwt_token>`
+  - or
+  - `Cookie: token=<jwt_token>`
+
+### Responses
+
+#### Success Response
+
+- **Status Code:** 200 OK
+- **Content:**
+
+```json
+{
+  "_id": "mongodb_generated_id",
+  "fullname": {
+    "firstname": "string",
+    "lastname": "string"
+  },
+  "email": "string",
+  "socketId": null
+}
+```
+
+
+#### Error Response
+
+* **Status Code:** 401 Unauthorized
+* **Content:**
+
+```json
+{
+  "message": "Authentication required"
+}
+```
+
+
+## Logout User Endpoint
+
+### `GET /users/logout`
+
+Logs out the currently authenticated user.
+
+### Request
+
+* **Method:** GET
+* **URL:** `/users/logout`
+* **Headers:**
+  * `Authorization: Bearer <jwt_token>`
+  * or
+  * `Cookie: token=<jwt_token>`
 
 ### Responses
 
@@ -164,53 +284,25 @@ Authenticates a user and returns a JWT token.
 
   ```json
   {
-    "token": "jwt_token_string",
-    "user": {
-      "_id": "mongodb_generated_id",
-      "fullname": {
-        "firstname": "string",
-        "lastname": "string"
-      },
-      "email": "string",
-      "socketId": null
-    }
+    "message": "Logged Out"
   }
   ```
 
-Error Responses
-
-##### Validation Error
-
-* **Status Code:** 400 Bad Request
-* **Content:**
-
-  ```json
-  {
-    "token": "jwt_token_string",
-    "user": {
-      "_id": "mongodb_generated_id",
-      "fullname": {
-        "firstname": "string",
-        "lastname": "string"
-      },
-      "email": "string",
-      "socketId": null
-    }
-  }
-  ```
-  ##### Authentication Error
+  #### Error Response
 
 
   * **Status Code:** 401 Unauthorized
   * **Content:**
 
-  ```json
-  {
-    "message": "Invalid email or password"
-  }
-  ```
-  ### Security
+    ```json
+    {
+      "message": "Authentication required"
+    }
+    ```
 
-  * Passwords are compared using bcrypt
-  * JWT token is generated upon successful authentication
-  * Password is excluded from response
+### Security Notes
+
+* Both endpoints require valid JWT token authentication
+* Token can be provided via Authorization header or Cookie
+* On logout, token is blacklisted to prevent reuse
+* Cookies are cleared on logout.

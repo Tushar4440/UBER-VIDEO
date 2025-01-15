@@ -25,7 +25,9 @@ router.post('/login',[
 )
 
 //! profile route
-router.post('/profile', authMiddleware.authUser ,userController.getUserPofile)
+router.get('/profile', authMiddleware.authUser , userController.getUserPofile)
 
+//! logout route
+router.get('/logout', authMiddleware.authUser, userController.logoutUser)
 
 module.exports = router;
