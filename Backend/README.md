@@ -247,7 +247,6 @@ Retrieves the authenticated user's profile information.
 }
 ```
 
-
 #### Error Response
 
 * **Status Code:** 401 Unauthorized
@@ -258,7 +257,6 @@ Retrieves the authenticated user's profile information.
   "message": "Authentication required"
 }
 ```
-
 
 ## Logout User Endpoint
 
@@ -306,3 +304,106 @@ Logs out the currently authenticated user.
 * Token can be provided via Authorization header or Cookie
 * On logout, token is blacklisted to prevent reuse
 * Cookies are cleared on logout.
+
+
+# Captain API Documentation
+
+## Register Captain Endpoint
+
+### `POST /captain/register`
+
+Creates a new captain account in the system.
+
+### Request
+
+- **Method:** POST
+- **URL:** `/captain/register`
+- **Content-Type:** `application/json`
+
+### Request Body
+
+```json
+{
+  "fullname": {
+    "firstName": "string",  // minimum 3 characters
+    "lastName": "string"    // optional, minimum 3 characters if provided
+  },
+  "email": "string",        // valid email format
+  "password": "string",     // minimum 6 characters
+  "vehicle": {
+    "color": "string",      // minimum 3 characters
+    "plate": "string",      // minimum 3 characters
+    "capacity": "number",   // minimum 1
+    "vehicleType": "string" // "car" | "motorcycle" | "auto"
+  }
+}
+```
+
+
+### Responses
+
+#### Success Response
+
+* **Status Code:** 201 Created
+* **Content:**
+
+  ```json
+  {
+    "token": "jwt_token_string",
+    "captain": {
+      "_id": "mongodb_generated_id",
+      "fullname": {
+        "firstName": "string",
+        "lastName": "string"
+      },
+      "email": "string",
+      "vehicle": {
+        "color": "string",
+        "plate": "string",
+        "capacity": number,
+        "vehicleType": "string"
+      },
+      "status": "inactive",
+      "socketId": null,
+      "location": {
+        "lat": null,
+        "lon": null
+      }
+    }
+  }
+  ```
+
+#### Error Responses
+
+##### Validation Error
+
+* **Status Code:** 400 Bad Request
+* **Content:**
+
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "First name must be at least 3 characters",
+        "param": "fullname.firstName",
+        "location": "body"
+      },
+      {
+        "msg": "Please fill a valid email address",
+        "param": "email",
+        "location": "body"
+      },
+      {
+        "msg": "Invalid vehicle type",
+        "param": "vehicle.vehicleType",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+### Security
+
+* Password is hashed using bcrypt before storage
+* JWT token is generated using the captain's ID
+* Password is excluded from response objects

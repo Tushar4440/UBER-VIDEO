@@ -13,6 +13,12 @@ module.exports.registerUser = async (req, res, next) => {
     }
     // It extracts fullname, email, and password from the request body.
     const { fullname, email, password } = req.body; 
+    // It checks if the user already exists in the database using userModel.findOne
+    const isUserAlreadyExist = await userModel.findOne({email});
+    if(isUserAlreadyExist){
+        return res.status(400).json({message: 'User already exists'});
+    }
+
     // The password provided by the user is hashed using userModel.hashPassword(password)
     const hashPassword = await userModel.hashPassword(password);
     // A new user is created with userService.createUser, which includes the user's firstname and lastname extracted from fullname, and the hashed password.
