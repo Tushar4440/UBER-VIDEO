@@ -305,7 +305,6 @@ Logs out the currently authenticated user.
 * On logout, token is blacklisted to prevent reuse
 * Cookies are cleared on logout.
 
-
 # Captain API Documentation
 
 ## Register Captain Endpoint
@@ -338,7 +337,6 @@ Creates a new captain account in the system.
   }
 }
 ```
-
 
 ### Responses
 
@@ -407,3 +405,142 @@ Creates a new captain account in the system.
 * Password is hashed using bcrypt before storage
 * JWT token is generated using the captain's ID
 * Password is excluded from response objects
+
+
+## Login Captain Endpoint
+
+### `POST /captain/login`
+
+Authenticates a captain and returns a JWT token.
+
+### Request
+
+- **Method:** POST
+- **URL:** `/captain/login`
+- **Content-Type:** `application/json`
+
+### Request Body
+
+```json
+{
+  "email": "string",    // valid email format
+  "password": "string"  // minimum 6 characters
+}
+```
+
+### Responses
+
+#### Success Response
+
+
+**Status Code:** 200 OK
+
+
+**Content:**
+
+```json
+{
+  "token": "jwt_token_string",
+  "captain": {
+    "_id": "mongodb_generated_id",
+    "fullname": {
+      "firstName": "string",
+      "lastName": "string"
+    },
+    "email": "string",
+    "vehicle": {
+      "color": "string",
+      "plate": "string",
+      "capacity": number,
+      "vehicleType": "string"
+    },
+    "status": "inactive",
+    "location": {
+      "lat": null,
+      "lon": null
+    }
+  }
+```
+
+## Get Captain Profile Endpoint
+
+### `GET /captain/profile`
+
+Retrieves the authenticated captain's profile.
+
+### Request
+
+* **Method:** GET
+* **URL:** `/captain/profile`
+* **Headers:**
+  * `Authorization: Bearer <jwt_token>`
+  * or
+  * `Cookie: token=<jwt_token>`
+
+### Responses
+
+#### Success Response
+
+
+**Status Code:** 200 OK
+
+
+**Content:**
+
+```json
+{
+  "captain": {
+    "_id": "mongodb_generated_id",
+    "fullname": {
+      "firstName": "string",
+      "lastName": "string"
+    },
+    "email": "string",
+    "vehicle": {
+      "color": "string",
+      "plate": "string",
+      "capacity": number,
+      "vehicleType": "string"
+    },
+    "status": "inactive",
+    "location": {
+      "lat": null,
+      "lon": null
+    }
+  }
+}
+```
+
+## Logout Captain Endpoint
+
+### `GET /captain/logout`
+
+Logs out the currently authenticated captain.
+
+### Request
+
+* **Method:** GET
+* **URL:** `/captain/logout`
+* **Headers:**
+  * `Authorization: Bearer <jwt_token>`
+  * or
+  * `Cookie: token=<jwt_token>`
+
+### Responses
+
+#### Success Response
+
+* **Status Code:** 200 OK
+
+  ```json
+  {
+    "message": "Logout success"
+  }
+  ```
+  ### Security Notes
+
+
+  * All endpoints except login require valid JWT token
+  * Token can be provided via Authorization header or Cookie
+  * Tokens are blacklisted on logout
+  * Cookies are cleared after logout

@@ -1,9 +1,11 @@
 //! this file is used for authenticating different users for user profiles access...
 const userModel = require('../models/user.model');
+const captainModel = require('../models/captain.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const blacklistTokenModel = require('../models/blacklistToken.model');
 
-//^ this function is used for authenticating i.e. the user is authenticated or not...
+//^ this function is used for authenticating i.e. the /*user*/ is authenticated or not...
 module.exports.authUser = async (req, res, next) => {
     // getting token from cookies or headers section 
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
@@ -12,7 +14,7 @@ module.exports.authUser = async (req, res, next) => {
         return res.status(401).json({ message: "Unauthorised access" })
     }
 
-    const isBlacklisted = await userModel.findOne({token : token});
+    const isBlacklisted = await blacklistTokenModel.findOne({token : token});
     if(isBlacklisted){
         return res.status(401).json({message : "Unauthorised access"})
     }
@@ -28,5 +30,31 @@ module.exports.authUser = async (req, res, next) => {
         return next();
     } catch (error) {
         return res.status(401).json({ message: "Unauthorized access" })
+    }
+}
+
+//^ this function is used for authenticating i.e. the /*captain*/ is authenticated or not...
+module.exports.authCaptain = async (req, res, next) => {
+    // getting token from cookies or headers section 
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    // checking if token is getting or not (unauthorised user)...
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorised access" })
+    }
+
+    const isBlacklisted = await blacklistTokenModel.findOne({token : token});
+
+    if(isBlacklisted){
+        return res.status(401).json({message : "Unauthorised access"})
+    }
+
+    try{
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const captain = await captainModel.findById(decoded._id);
+        req.captain = captain;
+        return next();
+    }
+    catch(err){
+        return res.status(401).json({message: "Unauthorized access"})
     }
 }
