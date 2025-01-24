@@ -14,7 +14,7 @@ const UserContext = ({ children }) => {
 
     return (
         <div>
-            <UserDataContext.Provider value={[user, setUser]}>  {/* //!  for data providing to pages accurately and we can use the data anywhere... */}
+            <UserDataContext.Provider value={{user, setUser}}>  {/* //!  for data providing to pages accurately and we can use the data anywhere... */}
                 {children}
             </UserDataContext.Provider>
         </div>
