@@ -1,10 +1,10 @@
 const captainModel = require('../models/captain.model');
-const captainService = require('../services/captain.services');
+const captainService = require('../services/captain.service');
 const { validationResult } = require('express-validator');
 const blacklistTokenModel = require('../models/blacklistToken.model');
 
 // register captain controller...
-module.exports.registerCaptain = async (req, res, next) => {
+module.exports.registerCaptain = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });

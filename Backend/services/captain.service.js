@@ -20,6 +20,6 @@ module.exports.createCaptain = async ({
             vehicleType
         }
     })
-
+    // console.log(captain);
     return captain;
 }

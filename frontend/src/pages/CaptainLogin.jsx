@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { CaptainDataContext } from '../context/CaptainContext'
 import { useNavigate } from 'react-router-dom'
@@ -8,16 +8,16 @@ const CaptainLogin = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const { captain, setCaptain } = React.useContext(CaptainDataContext)
+    const { captain, setCaptain } = useContext(CaptainDataContext)
     const navigate = useNavigate()
 
-    const submitHandler = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        const captain = ({
+        const captainData = ({
             email: email,
             password: password
         })
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, captain)
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, captainData)
 
         if (response.status === 200) {
             const data = response.data
@@ -25,7 +25,26 @@ const CaptainLogin = () => {
             localStorage.setItem('token', data.token)
             navigate('/captain-home')
         }
-        
+
+        setEmail('')
+        setPassword('')
+    }
+
+    const submitHandler = async (e) => {
+        e.preventDefault()
+        const captainData = ({
+            email: email,
+            password: password
+        })
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, captainData)
+
+        if (response.status === 200) {
+            const data = response.data
+            setCaptain(data.captain)
+            localStorage.setItem('token', data.token)
+            navigate('/captain-home')
+        }
+
 
         setEmail('')
         setPassword('')
@@ -43,7 +62,7 @@ const CaptainLogin = () => {
                     <input required value={password} onChange={(e) => {
                         setPassword(e.target.value)
                     }} className='bg-[#eeeeee] mb-7 rounded px-4 py-2 border w-full text-lg placeholder:text-base' type='password' placeholder='password' />
-                    <button required className='bg-[#000000] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg placeholder:text-base' >Login</button>
+                    <button onTouchEnd={(e)=>handleSubmit(e)} type='submit' required className='bg-[#000000] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg placeholder:text-base' >Login</button>
                 </form>
                 <p className='text-center'>Want to join us? <Link to='/captain-signup' className='text-blue-600'>Register as a Captain </Link></p>
             </div>

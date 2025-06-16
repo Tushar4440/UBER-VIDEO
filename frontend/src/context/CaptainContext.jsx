@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom'
 
 export const CaptainDataContext = createContext();
 
+// export const useCaptain = ()=>{
+//     const context = useContext(CaptainContext);
+//     if(!context){
+//         throw new Error('useCaptain must be within a captain provider');
+//     }
+//     return context;
+// }
 
 
 const CaptainContext = ({ children }) => {
